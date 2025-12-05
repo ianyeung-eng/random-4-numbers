@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#667eea">
-    
+    <meta name="mobile-web-app-capable" content="yes"> <!-- 修 deprecated -->
+    <meta name="apple-mobile-web-app-capable" content="yes"> <!-- 保留相容 -->
+
     <title>隨機4位數字（1-9不重複）</title>
     
     <!-- PWA 必備 -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -82,15 +82,18 @@
             const result = digits.slice(0, 4).join('');
             document.getElementById('result').textContent = result;
 
-            if (navigator.vibrate) {
+            // 只在用戶互動時震動，避免 Chrome 擋住
+            if (navigator.vibrate && this === event.target) { // 這是 button 點擊時
                 navigator.vibrate(80);
             }
         }
 
-        // 頁面載入立刻產生一次
-        window.onload = generate;
+        // 頁面載入時只顯示數字，不震動
+        window.onload = function() {
+            generate(); // 呼叫但不震動
+        };
 
-        // 註冊 Service Worker（PWA 離線功能）
+        // 註冊 Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
