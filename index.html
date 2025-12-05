@@ -9,9 +9,9 @@
 
     <title>隨機4位數字（1-9不重複）</title>
     
-    <!-- PWA 必備 -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <!-- PWA 必備：改成相對路徑 -->
+    <link rel="manifest" href="manifest.json"> <!-- 去掉開頭 / -->
+    <link rel="apple-touch-icon" href="icon-192.png"> <!-- 去掉開頭 / -->
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -69,7 +69,7 @@
 <body>
     <h1>隨機4位數字</h1>
     <div id="result">----</div>
-    <button onclick="generate()">生成號碼</button>
+    <button id="generateBtn">生成號碼</button> <!-- 加 ID 方便事件綁定 -->
     <div class="footer">1-9 不重複</div>
 
     <script>
@@ -81,22 +81,25 @@
             }
             const result = digits.slice(0, 4).join('');
             document.getElementById('result').textContent = result;
-
-            // 只在用戶互動時震動，避免 Chrome 擋住
-            if (navigator.vibrate && this === event.target) { // 這是 button 點擊時
-                navigator.vibrate(80);
-            }
         }
 
         // 頁面載入時只顯示數字，不震動
         window.onload = function() {
-            generate(); // 呼叫但不震動
+            generate();
         };
 
-        // 註冊 Service Worker
+        // 綁定按鈕事件：用戶互動時才震動
+        document.getElementById('generateBtn').addEventListener('click', function(event) {
+            generate();
+            if (navigator.vibrate) {
+                navigator.vibrate(80); // 現在安全，因為是用戶點擊
+            }
+        });
+
+        // 註冊 Service Worker：改成相對路徑
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js') // 去掉開頭 /
                     .then(reg => console.log('Service Worker 註冊成功'))
                     .catch(err => console.log('Service Worker 註冊失敗', err));
             });
